@@ -1,0 +1,15 @@
+(
+  border_width: 3,
+  // border_width: [3, 0],
+  // border_width: [3, 8],
+  // border_width: [3, 5, 8, 13],
+  margin: [8, 14, 8, 13],
+  // margin: 5,
+  default_border_color: "#646669",
+  floating_border_color: "#e2b714",
+  focused_border_color: "#dcd8cf",
+  outer_border_color: "#323234",
+  // [[gutter]],
+  // side: "Top",
+  // value: 42,
+)

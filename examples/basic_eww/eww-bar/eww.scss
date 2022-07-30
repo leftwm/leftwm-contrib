@@ -49,6 +49,10 @@
 .label-ram {
   font-size: large;
 }
+.workspaces button {
+  font-size: 24px;
+  padding: 6px;
+}
 .workspaces button:hover {
   color: #D35D6E;
 }
@@ -59,6 +63,10 @@
 .ws-button-visible {
   color: #D35D6E;
   background-color: #4e4e4e;
+}
+.ws-button-urgent {
+  color: #ffd5ca;
+  background-color: #D35D6E;
 }
 .ws-button-busy {
   color: #D35D6E;

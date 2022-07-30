@@ -13,6 +13,7 @@ Contributions of any kind are welcome at any time, please just follow these very
 - basic_lemonbar
 - basic_polybar
 - basic_xmobar
+- config_ron
 - controlling_leftwm
 
 ### Patches

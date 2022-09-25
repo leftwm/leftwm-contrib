@@ -1,0 +1,90 @@
+diff --git a/leftwm-core/src/command.rs b/leftwm-core/src/command.rs
+index d97956b..d368281 100644
+--- a/leftwm-core/src/command.rs
++++ b/leftwm-core/src/command.rs
+@@ -13,6 +13,7 @@ pub enum Command {
+     HardReload,
+     ToggleScratchPad(String),
+     ToggleFullScreen,
++    ToggleMargin,
+     ToggleSticky,
+     GoToTag {
+         tag: TagId,
+diff --git a/leftwm-core/src/handlers/command_handler.rs b/leftwm-core/src/handlers/command_handler.rs
+index 77d9068..a6a782e 100644
+--- a/leftwm-core/src/handlers/command_handler.rs
++++ b/leftwm-core/src/handlers/command_handler.rs
+@@ -53,6 +53,7 @@ fn process_internal<C: Config, SERVER: DisplayServer>(
+ 
+         Command::ToggleScratchPad(name) => toggle_scratchpad(manager, name),
+ 
++        Command::ToggleMargin => toggle_margin(state),
+         Command::ToggleFullScreen => toggle_state(state, WindowState::Fullscreen),
+         Command::ToggleSticky => toggle_state(state, WindowState::Sticky),
+ 
+@@ -214,6 +215,17 @@ fn toggle_scratchpad<C: Config, SERVER: DisplayServer>(
+     None
+ }
+ 
++fn toggle_margin(state: &mut State) -> Option<bool> {
++    let ws = state.focus_manager.workspace_mut(&mut state.workspaces)?;
++    let margin = ws.margin_multiplier();
++    if margin > 0.0 {
++        set_margin_multiplier(state, 0.0);
++    } else {
++        set_margin_multiplier(state, 1.0);
++    }
++    Some(true)
++}
++
+ fn toggle_state(state: &mut State, window_state: WindowState) -> Option<bool> {
+     let window = state.focus_manager.window(&state.windows)?;
+     let handle = window.handle;
+diff --git a/leftwm-core/src/utils/command_pipe.rs b/leftwm-core/src/utils/command_pipe.rs
+index 226a768..97e6611 100644
+--- a/leftwm-core/src/utils/command_pipe.rs
++++ b/leftwm-core/src/utils/command_pipe.rs
+@@ -92,6 +92,7 @@ fn parse_command(s: &str) -> Result<Command, Box<dyn std::error::Error>> {
+     match head {
+         "SoftReload" => Ok(Command::SoftReload),
+         "ToggleFullScreen" => Ok(Command::ToggleFullScreen),
++        "ToggleMargin" => Ok(Command::ToggleMargin),
+         "ToggleSticky" => Ok(Command::ToggleSticky),
+         "SwapScreens" => Ok(Command::SwapScreens),
+         "MoveWindowToLastWorkspace" => Ok(Command::MoveWindowToLastWorkspace),
+diff --git a/leftwm/src/bin/leftwm-command.rs b/leftwm/src/bin/leftwm-command.rs
+index 449b5d8..3575673 100644
+--- a/leftwm/src/bin/leftwm-command.rs
++++ b/leftwm/src/bin/leftwm-command.rs
+@@ -53,6 +53,7 @@ async fn main() -> Result<()> {
+         UnloadTheme
+         SoftReload
+         ToggleFullScreen
++        ToggleMargin
+         ToggleSticky
+         SwapScreens
+         MoveWindowToLastWorkspace
+diff --git a/leftwm/src/command.rs b/leftwm/src/command.rs
+index 7752502..fdfcd0f 100644
+--- a/leftwm/src/command.rs
++++ b/leftwm/src/command.rs
+@@ -19,6 +19,7 @@ pub enum BaseCommand {
+     HardReload,
+     ToggleScratchPad,
+     ToggleFullScreen,
++    ToggleMargin,
+     ToggleSticky,
+     GotoTag,
+     ReturnToLastTag,
+diff --git a/leftwm/src/config/keybind.rs b/leftwm/src/config/keybind.rs
+index 10d75c0..a7d5c9a 100644
+--- a/leftwm/src/config/keybind.rs
++++ b/leftwm/src/config/keybind.rs
+@@ -35,6 +35,7 @@ impl Keybind {
+                 leftwm_core::Command::ToggleScratchPad(ensure_non_empty!(self.value.clone()))
+             }
+             BaseCommand::ToggleFullScreen => leftwm_core::Command::ToggleFullScreen,
++            BaseCommand::ToggleMargin => leftwm_core::Command::ToggleMargin,
+             BaseCommand::ToggleSticky => leftwm_core::Command::ToggleSticky,
+             BaseCommand::GotoTag => leftwm_core::Command::GoToTag {
+                 tag: usize::from_str(&self.value).context("invalid index value for GotoTag")?,

@@ -10,12 +10,12 @@
             :value volume
             :onchange "amixer -D pulse sset Master {}%")
     (metric :label ""
-            :value EWW_RAM
+            :value '${EWW_RAM.used_mem_perc}'
             :onchange "")
     (metric :label "💾"
             :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)}
             :onchange "")
-    time))
+    (time)))
 
 ; eww is natively able to parse the JSON output of `leftwm-state`
 ; since eww also has the ability of `for` loops there is no need for a `liquid` template anymore
@@ -54,12 +54,14 @@
            :value value
            :onchange onchange)))
 
+(defwidget time []
+  (box :class "time" {time}))
 
 
 (deflisten music :initial ""
   "playerctl --follow metadata --format '{{ artist }} - {{ title }}' || true")
 
-(defpoll volume :interval "1s"
+(defpoll volume :interval "1s" :initial "50"
   "scripts/getvol")
 
 (defpoll time :interval "10s"

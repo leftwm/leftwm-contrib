@@ -1,2 +1,6 @@
 #!/bin/sh
+if [ -x "$(command -v amixer)" ]; then
 amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%' | head -1
+elif [ -x "$(command -v pactl)" ]; then
+pactl list sinks | grep left: | awk '{print $5}' | tr -d "%" | head -1
+fi
